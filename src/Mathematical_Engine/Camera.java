@@ -2,7 +2,9 @@ package Mathematical_Engine;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Set;
+import java.util.Vector;
 
 import static java.lang.Math.*;
 
@@ -35,6 +37,7 @@ public class Camera {
         double d = D.dot(EP);
         double u = U.dot(EP);
         double r = R.dot(EP);
+        if (d <= 0) return null;
         double um = u*z/d;
         double rm = r*z/d;
         return new V2(rm, um);
@@ -68,65 +71,74 @@ public class Camera {
     }
 
     public void drawPoint(Graphics g, V3 p) {
-        s2.drawPoint(g, project(p));
+        V2 pp1 = project(p);
+        if (pp1 == null) return;
+        s2.drawPoint(g, pp1);
     }
 
     public void drawPoint(Graphics g, V3 p, Color color) {
-        s2.drawPoint(g, project(p), color);
+        V2 pp1 = project(p);
+        if (pp1 == null) return;
+        s2.drawPoint(g, pp1, color);
     }
 
     public void drawPoint(Graphics g, V3 p, Color color, int diameter) {
-        s2.drawPoint(g, project(p), color, diameter);
+        V2 pp1 = project(p);
+        if (pp1 == null) return;
+        s2.drawPoint(g, pp1, color, diameter);
     }
 
     public void drawLine(Graphics g, V3 p1, V3 p2) {
-        s2.drawLine(g, project(p1), project(p2));
+        V2 pp1 = project(p1);
+        V2 pp2 = project(p2);
+        if (pp1 == null || pp2 == null) return;
+        s2.drawLine(g, pp1, pp2);
     }
 
     public void drawLine(Graphics g, V3 p1, V3 p2, Color color) {
-        s2.drawLine(g, project(p1), project(p2), color);
+        V2 pp1 = project(p1);
+        V2 pp2 = project(p2);
+        if (pp1 == null || pp2 == null) return;
+        s2.drawLine(g, pp1, pp2, color);
     }
 
     public void drawLine(Graphics g, V3 p1, V3 p2, Color color, float weight) {
-        s2.drawLine(g, project(p1), project(p2), color, weight);
+        V2 pp1 = project(p1);
+        V2 pp2 = project(p2);
+        if (pp1 == null || pp2 == null) return;
+        s2.drawLine(g, pp1, pp2, color, weight);
     }
 
     public void drawString(Graphics g, String text, V3 p1, Color color, Font font) {
-        s2.drawString(g, text, project(p1), color, font);
+        V2 pp1 = project(p1);
+        if (pp1 == null) return;
+        s2.drawString(g, text, pp1, color, font);
     }
 
-    public void drawFace(Graphics g, V3 v1, V3 v2, V3 v3) {
-        V3 newV1 = v1.mul(10.0);
-        V3 newV2 = v2.mul(10.0);
-        V3 newV3 = v3.mul(10.0);
-
-        // Project vertices onto the 2D screen
-        //V2 p1 = project(v1);
-        //V2 p2 = project(v2);
-        //V2 p3 = project(v3);
-        V2 p1 = project(newV1);
-        V2 p2 = project(newV2);
-        V2 p3 = project(newV3);
-
-        //drawLine(g, v1, v2, Color.BLACK);
-        //drawLine(g, v2, v3, Color.BLACK);
-        //drawLine(g, v3, v1, Color.BLACK);
-        drawLine(g, newV1, newV2, Color.BLACK);
-        drawLine(g, newV2, newV3, Color.BLACK);
-        drawLine(g, newV3, newV1, Color.BLACK);
-
-        /*
-        // Convert projected coordinates to integers
-        int x1 = (int) Math.round(p1.x);
-        int y1 = (int) Math.round(p1.y);
-        int x2 = (int) Math.round(p2.x);
-        int y2 = (int) Math.round(p2.y);
-        int x3 = (int) Math.round(p3.x);
-        int y3 = (int) Math.round(p3.y);
+    //TODO FIX THE REST
+    public void drawFace(Graphics g, ArrayList<V3> vectorsToDraw) {
+        V3 firstVector;
+        V3 secondVector = null;
+        int[] xPoints = new int[vectorsToDraw.size()];
+        int[] yPoints = new int[vectorsToDraw.size()];
+        for (int i = 0; i < vectorsToDraw.size(); i++) {
+            if (i != vectorsToDraw.size()-1) {
+                firstVector = vectorsToDraw.get(i);
+                if (secondVector != null) {
+                    drawLine(g, firstVector, secondVector, Color.BLACK);
+                }
+                secondVector = firstVector;
+            } else {
+                firstVector = vectorsToDraw.get(i);
+                secondVector = vectorsToDraw.get(0);
+                drawLine(g, firstVector, secondVector, Color.BLACK);
+            }
+            V2 transformedVector = s2.transform(project(vectorsToDraw.get(i)));
+            xPoints[i] = (int) Math.round(transformedVector.x);
+            yPoints[i] = (int) Math.round(transformedVector.y);
+        }
 
         // Create arrays of x and y coordinates for the vertices of the polygon
-        int[] xPoints = {x1, x2, x3};
-        int[] yPoints = {y1, y2, y3};
 
         // Fill the polygon with the specified color
         g.setColor(Color.RED);
@@ -135,25 +147,27 @@ public class Camera {
         // Draw the outline of the polygon
         g.setColor(Color.BLACK);
         g.drawPolygon(xPoints, yPoints, 3);
-        */
+    }
+
+    public void drawPolygon(Graphics g) {
+
     }
 
     //TODO ASK WHY YAW UNROLLS, BUT PITCH DOESN'T
     public void yaw(double angle) {
-        M3 Sx = new M3(0, -1, 0,
-                1, 0, 0,
-                0, 0, 0);
+        M3 Sx = new M3(0, -U.z, U.y,
+                            U.z, 0, -U.x,
+                            -U.y, U.x, 0);
         double phi = (PI / 360) * 2 * angle;
         M3 Rx = I.add(Sx.mul(sin(phi))).add(Sx.mul(Sx).mul(1 - cos(phi)));
-        D = Rx.mul(D).unit();
-        R = D.cross(k).unit();
-        U = R.cross(D);
+        D = Rx.mul(D);
+        R = Rx.mul(R);
     }
 
     public void roll(double angle) {
-        M3 Sz = new M3( 0, 0, 0,
-                        0, 0, -1,
-                        0, 1, 0);
+        M3 Sz = new M3( 0, -D.z, D.y,
+                            D.z, 0, -D.x,
+                            -D.y, D.x, 0);
         double phi = (PI/360)*2*angle;
         M3 Rz = I.add(Sz.mul(sin(phi))).add(Sz.mul(Sz).mul(1-cos(phi)));
         U = Rz.mul(U);
@@ -161,15 +175,14 @@ public class Camera {
     }
 
     public void pitch(double angle) {
-        M3 Sy = new M3( 0, 0, 1,
-                0, 0, 0,
-                -1, 0, 0);
+        M3 Sy = new M3( 0, -R.z, R.y,
+                            R.z, 0, -R.x,
+                        -R.y, R.x, 0);
         double phi = (PI/360)*angle;
         M3 Ry = I.add(Sy.mul(sin(phi))).add(Sy.mul(Sy).mul(1-cos(phi)));
         D = Ry.mul(D);
         U = Ry.mul(U);
     }
-
 
 
     public void moveDirection(Set<String> directions) {
@@ -180,23 +193,24 @@ public class Camera {
         for (String direction : directions) {
             switch (direction) {
                 case "Left":
-                    directionToMove = D.cross(U).unit().mul(-1);
+                    directionToMove = D.cross(U).unit().mul(-1); // Move left
                     break;
                 case "Right":
-                    directionToMove = D.cross(U).unit();
+                    directionToMove = D.cross(U).unit(); // Move right
                     break;
                 case "Forward":
-                    directionToMove = new V3(D.x, D.y, 0).unit();
+                    directionToMove = new V3(D.x, D.y, 0).unit(); // Move forward (horizontal component of D)
                     break;
                 case "Back":
-                    directionToMove = new V3(D.x, D.y, 0).unit().mul(-1);
+                    directionToMove = new V3(D.x, D.y, 0).unit().mul(-1); // Move backward (horizontal component of D)
                     break;
             }
         }
         if (!directionToMove.equals(new V3(0, 0, 0))) {
-            directionToMove = directionToMove.unit();
+            directionToMove = directionToMove.unit(); // Normalize the movement direction vector
         }
-        E = E.add(directionToMove.mul(moveAmount));
+        // Update camera position only in the horizontal plane
+        E = E.add(new V3(directionToMove.x, directionToMove.y, 0).mul(moveAmount));
     }
 
     private Point getWindowCenter(Component component) {

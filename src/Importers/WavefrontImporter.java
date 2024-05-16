@@ -1,8 +1,6 @@
     package Importers;
 
     import Mathematical_Engine.Camera;
-    import Mathematical_Engine.Camera1;
-    import Mathematical_Engine.Camera2;
     import Mathematical_Engine.V3;
 
     import java.awt.*;
@@ -27,89 +25,66 @@
             extractData(filePath);
         }
 
-        public void draw(Graphics g, Camera2 camera) {
+        public void draw(Graphics g, Camera camera, V3 startPoint, double ratio) {
             // Draw lines (if any)
             for (ArrayList<Integer> line : lines) {
-                camera.drawLine(g, vectors.get(line.get(0) - 1), vectors.get(line.get(1) - 1));
-            }
-            for (ArrayList<Integer> face : faces) {
-                // Retrieve the vertex indices for the current face
-                int v1Index = face.get(0) - 1;
-                int v2Index = face.get(1) - 1;
-                int v3Index = face.get(2) - 1;
+                int v1Index = line.get(0) - 1;
+                int v2Index = line.get(1) - 1;
 
                 // Retrieve the corresponding vertices from the list
-                if (v1Index <= vectors.size() && v2Index <= vectors.size() && v3Index <= vectors.size()) {
-                    V3 v1 = vectors.get(v1Index);
-                    V3 v2 = vectors.get(v2Index);
-                    V3 v3 = vectors.get(v3Index);
+                if (v1Index < vectors.size() && v2Index < vectors.size()) {
+                    V3 v1 = vectors.get(v1Index).mul(ratio).add(startPoint);
+                    V3 v2 = vectors.get(v2Index).mul(ratio).add(startPoint);
 
-                    // Retrieve the vertex normals for each vertex (if available)
-                    V3 n1 = (v1Index < normalVectors.size()) ? normalVectors.get(v1Index) : null;
-                    V3 n2 = (v2Index < normalVectors.size()) ? normalVectors.get(v2Index) : null;
-                    V3 n3 = (v3Index < normalVectors.size()) ? normalVectors.get(v3Index) : null;
+                    // Draw the line using the camera's method
+                    camera.drawLine(g, v1, v2);
+                }
+            }
 
-                    // Draw the face using the camera's methods
-                    //camera.drawFace(g, v1, v2, v3, n1, n2, n3);
-                    camera.drawFace(g, v1, v2, v3);
+            // Draw faces (if any)
+            for (ArrayList<Integer> face : faces) {
+                ArrayList<V3> vectorsToDraw = new ArrayList<>();
+                for (int vIndex : face) {
+                    int vectorIndex = vIndex - 1;
+                    if (vectorIndex >= 0 && vectorIndex < vectors.size()) {
+                        V3 vector = vectors.get(vectorIndex).mul(ratio).add(startPoint);
+                        vectorsToDraw.add(vector);
+                    }
+                }
+                if (vectorsToDraw.size() > 2) {
+                    camera.drawFace(g, vectorsToDraw);
                 }
             }
         }
 
-        public void draw(Graphics g, Camera1 camera) {
+        public void draw(Graphics g, Camera camera, double ratio) {
             // Draw lines (if any)
             for (ArrayList<Integer> line : lines) {
-                camera.drawLine(g, vectors.get(line.get(0) - 1), vectors.get(line.get(1) - 1));
-            }
-            for (ArrayList<Integer> face : faces) {
-                // Retrieve the vertex indices for the current face
-                int v1Index = face.get(0) - 1;
-                int v2Index = face.get(1) - 1;
-                int v3Index = face.get(2) - 1;
+                int v1Index = line.get(0) - 1;
+                int v2Index = line.get(1) - 1;
 
                 // Retrieve the corresponding vertices from the list
-                if (v1Index <= vectors.size() && v2Index <= vectors.size() && v3Index <= vectors.size()) {
-                    V3 v1 = vectors.get(v1Index);
-                    V3 v2 = vectors.get(v2Index);
-                    V3 v3 = vectors.get(v3Index);
+                if (v1Index < vectors.size() && v2Index < vectors.size()) {
+                    V3 v1 = vectors.get(v1Index).mul(ratio);
+                    V3 v2 = vectors.get(v2Index).mul(ratio);
 
-                    // Retrieve the vertex normals for each vertex (if available)
-                    V3 n1 = (v1Index < normalVectors.size()) ? normalVectors.get(v1Index) : null;
-                    V3 n2 = (v2Index < normalVectors.size()) ? normalVectors.get(v2Index) : null;
-                    V3 n3 = (v3Index < normalVectors.size()) ? normalVectors.get(v3Index) : null;
-
-                    // Draw the face using the camera's methods
-                    //camera.drawFace(g, v1, v2, v3, n1, n2, n3);
-                    camera.drawFace(g, v1, v2, v3);
+                    // Draw the line using the camera's method
+                    camera.drawLine(g, v1, v2);
                 }
             }
-        }
 
-        public void draw(Graphics g, Camera camera) {
-            // Draw lines (if any)
-            for (ArrayList<Integer> line : lines) {
-                camera.drawLine(g, vectors.get(line.get(0) - 1), vectors.get(line.get(1) - 1));
-            }
+            // Draw faces (if any)
             for (ArrayList<Integer> face : faces) {
-                // Retrieve the vertex indices for the current face
-                int v1Index = face.get(0) - 1;
-                int v2Index = face.get(1) - 1;
-                int v3Index = face.get(2) - 1;
-
-                // Retrieve the corresponding vertices from the list
-                if (v1Index <= vectors.size() && v2Index <= vectors.size() && v3Index <= vectors.size()) {
-                    V3 v1 = vectors.get(v1Index);
-                    V3 v2 = vectors.get(v2Index);
-                    V3 v3 = vectors.get(v3Index);
-
-                    // Retrieve the vertex normals for each vertex (if available)
-                    V3 n1 = (v1Index < normalVectors.size()) ? normalVectors.get(v1Index) : null;
-                    V3 n2 = (v2Index < normalVectors.size()) ? normalVectors.get(v2Index) : null;
-                    V3 n3 = (v3Index < normalVectors.size()) ? normalVectors.get(v3Index) : null;
-
-                    // Draw the face using the camera's methods
-                    //camera.drawFace(g, v1, v2, v3, n1, n2, n3);
-                    camera.drawFace(g, v1, v2, v3);
+                ArrayList<V3> vectorsToDraw = new ArrayList<>();
+                for (int vIndex : face) {
+                    int vectorIndex = vIndex - 1;
+                    if (vectorIndex >= 0 && vectorIndex < vectors.size()) {
+                        V3 vector = vectors.get(vectorIndex).mul(ratio);
+                        vectorsToDraw.add(vector);
+                    }
+                }
+                if (vectorsToDraw.size() > 2) {
+                    camera.drawFace(g, vectorsToDraw);
                 }
             }
         }
