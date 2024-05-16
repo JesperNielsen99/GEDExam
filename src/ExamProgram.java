@@ -34,6 +34,7 @@ public class ExamProgram extends JFrame {
         MouseMotionHandler mouseMotionHandler = new MouseMotionHandler();
         MouseWheelHandler wheelHandler = new MouseWheelHandler();
         WavefrontImporter wf = new WavefrontImporter("src/Files/Tea_Pot.obj");
+        //TODO ASK WHY IT ONLY MAKES DOTS
         //WavefrontImporter wf = new WavefrontImporter("src/Files/Ferret.obj");
 
 
@@ -54,6 +55,7 @@ public class ExamProgram extends JFrame {
             super.paintComponent(g);
             g.drawString("Counter = " + fpsCounter.counter, 10, 10);
             g.drawString("Zoom = " + cam.getZoom(), getWidth()-70, 10);
+            g.drawString("Coordinates = (" + cam.getE().x + ", " + cam.getE().y + ", " + cam.getE().z+ ")", getWidth()-190, getHeight()-5);
             wf.draw(g, cam);
             cam.drawAxis(g);
         }

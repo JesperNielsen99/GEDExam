@@ -59,6 +59,7 @@ public class ExamProgram2 extends JFrame {
             super.paintComponent(g);
             g.drawString("Counter = " + fpsCounter.counter, 10, 10);
             g.drawString("Zoom = " + cam.getZoom(), getWidth()-70, 10);
+            g.drawString("Coordinates = (" + cam.getE().x + ", " + cam.getE().y + ", " + cam.getE().z+ ")", getWidth()-190, getHeight()-5);
             wf.draw(g, cam);
             cam.drawAxis(g);
         }

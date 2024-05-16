@@ -56,6 +56,7 @@ public class ExamProgram1 extends JFrame {
             super.paintComponent(g);
             g.drawString("Counter = " + fpsCounter.counter, 10, 10);
             g.drawString("Zoom = " + cam.getZoom(), getWidth()-70, 10);
+            g.drawString("Coordinates = (" + cam.getE().x + ", " + cam.getE().y + ", " + cam.getE().z+ ")", getWidth()-190, getHeight()-5);
             if (cam.isPointInFrustum(new V3(0, 0, 0), getWidth(), getHeight())) {
                 wf.draw(g, cam);
                 cam.drawAxis(g);

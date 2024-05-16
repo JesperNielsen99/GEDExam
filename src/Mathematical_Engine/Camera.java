@@ -55,6 +55,8 @@ public class Camera {
     }
     public double getZoom() { return z; }
 
+    public V3 getE() { return E; }
+
     public void drawAxis(Graphics g) {
         drawLine(g, O, i);
         drawLine(g, O, j);
@@ -94,12 +96,9 @@ public class Camera {
     }
 
     public void drawFace(Graphics g, V3 v1, V3 v2, V3 v3) {
-
-        //System.out.println(v1);
         V3 newV1 = v1.mul(10.0);
         V3 newV2 = v2.mul(10.0);
         V3 newV3 = v3.mul(10.0);
-        //System.out.println(newV1);
 
         // Project vertices onto the 2D screen
         //V2 p1 = project(v1);
@@ -117,21 +116,24 @@ public class Camera {
         drawLine(g, newV3, newV1, Color.BLACK);
 
         /*
-        //System.out.println("Double X: " + p1.x + ", " + p2.x + ", " + p3.x);
-        //System.out.println("Double Y: " + p1.y + ", " + p2.y + ", " + p3.y);
+        // Convert projected coordinates to integers
+        int x1 = (int) Math.round(p1.x);
+        int y1 = (int) Math.round(p1.y);
+        int x2 = (int) Math.round(p2.x);
+        int y2 = (int) Math.round(p2.y);
+        int x3 = (int) Math.round(p3.x);
+        int y3 = (int) Math.round(p3.y);
 
-        // Create an array of x and y coordinates for the vertices of the polygon
-        int[] xPoints = {(int) p1.x, (int) p2.x, (int) p3.x};
-        int[] yPoints = {(int) p1.y, (int) p2.y, (int) p3.y};
-        //System.out.println(xPoints[0] + ", " + xPoints[1] + ", " + xPoints[2]);
-        //System.out.println(yPoints[0] + ", " + yPoints[1] + ", " + yPoints[2]);
+        // Create arrays of x and y coordinates for the vertices of the polygon
+        int[] xPoints = {x1, x2, x3};
+        int[] yPoints = {y1, y2, y3};
 
         // Fill the polygon with the specified color
-        g.setColor(Color.GRAY); // You can adjust the fill color as needed
+        g.setColor(Color.RED);
         g.fillPolygon(xPoints, yPoints, 3);
 
         // Draw the outline of the polygon
-        g.setColor(Color.BLACK); // Example outline color, you can adjust it as needed
+        g.setColor(Color.BLACK);
         g.drawPolygon(xPoints, yPoints, 3);
         */
     }

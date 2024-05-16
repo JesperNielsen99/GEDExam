@@ -94,6 +94,8 @@ public class Camera1 {
 
     public double getZoom() { return z; }
 
+    public V3 getE() { return E; }
+
     public void drawAxis(Graphics g) {
         drawLine(g, O, i);
         drawLine(g, O, j);
