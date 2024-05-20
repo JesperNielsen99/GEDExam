@@ -115,12 +115,12 @@ public class Camera {
         s2.drawString(g, text, pp1, color, font);
     }
 
-    //TODO FIX THE REST
-    public void drawFace(Graphics g, ArrayList<V3> vectorsToDraw) {
+    public void drawFace(Graphics g, ArrayList<V3> vectorsToDraw, Color color) {
         V3 firstVector;
         V3 secondVector = null;
         int[] xPoints = new int[vectorsToDraw.size()];
         int[] yPoints = new int[vectorsToDraw.size()];
+        boolean canDraw = true;
         for (int i = 0; i < vectorsToDraw.size(); i++) {
             if (i != vectorsToDraw.size()-1) {
                 firstVector = vectorsToDraw.get(i);
@@ -133,52 +133,55 @@ public class Camera {
                 secondVector = vectorsToDraw.get(0);
                 drawLine(g, firstVector, secondVector, Color.BLACK);
             }
-            V2 transformedVector = s2.transform(project(vectorsToDraw.get(i)));
-            xPoints[i] = (int) Math.round(transformedVector.x);
-            yPoints[i] = (int) Math.round(transformedVector.y);
+            V2 projectedVector = project(vectorsToDraw.get(i));
+            if (projectedVector != null) {
+                V2 transformedVector = s2.transform(projectedVector);
+                xPoints[i] = (int) Math.round(transformedVector.x);
+                yPoints[i] = (int) Math.round(transformedVector.y);
+            } else {
+                canDraw = false;
+            }
         }
+        if (canDraw) {
+            drawPolygon(g, xPoints, yPoints, vectorsToDraw.size(), color);
+        }
+    }
 
-        // Create arrays of x and y coordinates for the vertices of the polygon
-
+    public void drawPolygon(Graphics g, int[] xPoints, int[] yPoints, int points, Color color) {
         // Fill the polygon with the specified color
-        g.setColor(Color.RED);
-        g.fillPolygon(xPoints, yPoints, 3);
+        g.setColor(color);
+        g.fillPolygon(xPoints, yPoints, points);
 
         // Draw the outline of the polygon
         g.setColor(Color.BLACK);
-        g.drawPolygon(xPoints, yPoints, 3);
+        g.drawPolygon(xPoints, yPoints, points);
     }
 
-    public void drawPolygon(Graphics g) {
-
-    }
-
-    //TODO ASK WHY YAW UNROLLS, BUT PITCH DOESN'T
     public void yaw(double angle) {
+        double phi = (PI / 360) * 2 * angle;
         M3 Sx = new M3(0, -U.z, U.y,
                             U.z, 0, -U.x,
                             -U.y, U.x, 0);
-        double phi = (PI / 360) * 2 * angle;
         M3 Rx = I.add(Sx.mul(sin(phi))).add(Sx.mul(Sx).mul(1 - cos(phi)));
         D = Rx.mul(D);
         R = Rx.mul(R);
     }
 
     public void roll(double angle) {
+        double phi = (PI/360)*2*angle;
         M3 Sz = new M3( 0, -D.z, D.y,
                             D.z, 0, -D.x,
                             -D.y, D.x, 0);
-        double phi = (PI/360)*2*angle;
         M3 Rz = I.add(Sz.mul(sin(phi))).add(Sz.mul(Sz).mul(1-cos(phi)));
         U = Rz.mul(U);
         R = Rz.mul(R);
     }
 
     public void pitch(double angle) {
+        double phi = (PI/360)*angle;
         M3 Sy = new M3( 0, -R.z, R.y,
                             R.z, 0, -R.x,
-                        -R.y, R.x, 0);
-        double phi = (PI/360)*angle;
+                            -R.y, R.x, 0);
         M3 Ry = I.add(Sy.mul(sin(phi))).add(Sy.mul(Sy).mul(1-cos(phi)));
         D = Ry.mul(D);
         U = Ry.mul(U);
@@ -229,8 +232,7 @@ public class Camera {
         int deltaX = mouseX - screenWidth / 2;
         int deltaY = mouseY - (screenHeight / 2) + 11;
 
-        System.out.println("DELTA X: " + deltaX);
-        System.out.println("DELTA Y: " + deltaY);
+        //TODO Quaternions could be used to fix the rotation of the yaw + pitch.
 
         // Update yaw and pitch based on mouse movement
         yaw(deltaX * sensitivity);

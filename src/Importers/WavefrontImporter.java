@@ -1,6 +1,7 @@
     package Importers;
 
     import Mathematical_Engine.Camera;
+    import Mathematical_Engine.M3;
     import Mathematical_Engine.V3;
 
     import java.awt.*;
@@ -10,22 +11,22 @@
     import java.util.Locale;
     import java.util.Scanner;
 
+    import static java.lang.Math.*;
+
     public class WavefrontImporter {
         ArrayList<V3> vectors;
         ArrayList<ArrayList<Integer>> faces;
         ArrayList<ArrayList<Integer>> lines;
-        ArrayList<V3>normalVectors;
         Scanner scanner;
 
         public WavefrontImporter(String filePath) {
             vectors = new ArrayList<>();
             faces = new ArrayList<>();
             lines = new ArrayList<>();
-            normalVectors = new ArrayList<>();
             extractData(filePath);
         }
 
-        public void draw(Graphics g, Camera camera, V3 startPoint, double ratio) {
+        public void draw(Graphics g, Camera camera, V3 startPoint, double ratio, Color color) {
             // Draw lines (if any)
             for (ArrayList<Integer> line : lines) {
                 int v1Index = line.get(0) - 1;
@@ -52,12 +53,12 @@
                     }
                 }
                 if (vectorsToDraw.size() > 2) {
-                    camera.drawFace(g, vectorsToDraw);
+                    camera.drawFace(g, vectorsToDraw, color);
                 }
             }
         }
 
-        public void draw(Graphics g, Camera camera, double ratio) {
+        public void draw(Graphics g, Camera camera, double ratio, Color color) {
             // Draw lines (if any)
             for (ArrayList<Integer> line : lines) {
                 int v1Index = line.get(0) - 1;
@@ -84,7 +85,7 @@
                     }
                 }
                 if (vectorsToDraw.size() > 2) {
-                    camera.drawFace(g, vectorsToDraw);
+                    camera.drawFace(g, vectorsToDraw, color);
                 }
             }
         }
@@ -145,34 +146,6 @@
                             this.lines.add(vectors);
                             vectors = new ArrayList<>();
                             break;
-                        } case "vt": {
-                            double u = Double.parseDouble(lines[1]);
-                            double v = Double.parseDouble(lines[2]);
-                            double w = 0;
-                            if (lines.length > 3) {
-                                w = Double.parseDouble(lines[3]);
-                            }
-
-                            // You can store these texture coordinates in your data structure or process them as needed
-                            break;
-                        } case "vn": {
-                            //vn -0.4839 -0.1646 0.8595
-                            double nx = Double.parseDouble(lines[1]);
-                            double ny = Double.parseDouble(lines[2]);
-                            double nz = Double.parseDouble(lines[3]);
-                            V3 normal = new V3(nx, ny, nz);
-                            normalVectors.add(normal);
-                            break;
-                        } case "usemtl": {
-                            // Handling material usage (usemtl)
-                            String materialName = lines[1];
-                            // You can store the material name or associate it with relevant faces or vertices
-                            break;
-                        } case "mtllib": {
-                            // Handling material library (mtllib)
-                            String mtlFileName = lines[1];
-                            // Store the name of the material library file or process it as needed
-                            break;
                         }
                     }
                 }
@@ -185,5 +158,41 @@
                 newVector.add(vector);
             }
             return newVector.div(vectors.size());
+        }
+
+        public void rotate(double angle, String axis) {
+            M3 I = new M3(1,0,0,
+                    0,1,0,
+                    0,0,1);
+            double phi = (PI/360)*2*angle;
+            M3 rotaionMatrix = null;
+            switch (axis) {
+                case "y": {
+                    rotaionMatrix = new M3(Math.cos(phi), 0, Math.sin(phi),
+                                        0, 1, 0,
+                                            -Math.sin(phi), 0, Math.cos(phi));
+                    break;
+                }
+                case "x": {
+                    rotaionMatrix = new M3(1, 0, 0,
+                                            0, Math.cos(phi), -Math.sin(phi),
+                                            0, Math.sin(phi), Math.cos(phi));
+                    break;
+                }
+                case "z": {
+                    rotaionMatrix = new M3(Math.cos(phi), -Math.sin(phi), 0,
+                                           Math.sin(phi), Math.cos(phi), 0,
+                                      0, 0, 1);
+                    break;
+                }
+            }
+            if (rotaionMatrix != null) {
+                for (int i = 0; i < vectors.size(); i++) {
+                    System.out.println("OLD VECTOR: " + vectors.get(i));
+                    V3 vector = rotaionMatrix.mul(vectors.get(i));
+                    System.out.println("NEW VECTOR: " + vector);
+                    vectors.set(i, vector);
+                }
+            }
         }
     }

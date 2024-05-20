@@ -33,9 +33,8 @@ public class ExamProgram extends JFrame {
         KeyListener keyListener = new KeyListener();
         MouseMotionHandler mouseMotionHandler = new MouseMotionHandler();
         MouseWheelHandler wheelHandler = new MouseWheelHandler();
-        WavefrontImporter wf1 = new WavefrontImporter("src/Files/Tea_Pot.obj");
-        //TODO ASK WHY IT ONLY MAKES DOTS
         WavefrontImporter wf = new WavefrontImporter("src/Files/Ferret.obj");
+        WavefrontImporter wf1 = new WavefrontImporter("src/Files/Tea_Pot.obj");
 
 
 
@@ -46,9 +45,11 @@ public class ExamProgram extends JFrame {
             addKeyListener(keyListener);
             addMouseMotionListener(mouseMotionHandler);
             addMouseWheelListener(wheelHandler);
-            cam.moveTo(new V3(10,5,5));
-            cam.focus(new V3(0, 0, 0));
+            cam.moveTo(new V3(30, 15,5));
+            cam.focus(wf.getCenter());
             cam.zoom(6);
+            wf.rotate(90, "x");
+            wf.rotate(180, "z");
         }
 
         public void paintComponent(Graphics g) {
@@ -56,8 +57,8 @@ public class ExamProgram extends JFrame {
             g.drawString("Counter = " + fpsCounter.counter, 10, 10);
             g.drawString("Zoom = " + cam.getZoom(), getWidth()-70, 10);
             g.drawString("Coordinates = (" + cam.getE().x + ", " + cam.getE().y + ", " + cam.getE().z+ ")", getWidth()-190, getHeight()-5);
-            wf.draw(g, cam, new V3(0, 0, 0), 0.1);
-            wf1.draw(g, cam, new V3(5, 5, 0), 2);
+            wf.draw(g, cam, new V3(0, 0, 0), 0.1, Color.GREEN);
+            //wf1.draw(g, cam, new V3(5, 5, 0), 2, Color.RED);
             cam.drawAxis(g);
         }
 
@@ -143,7 +144,6 @@ public class ExamProgram extends JFrame {
         class MouseMotionHandler extends MouseAdapter {
             int prevX, prevY;
 
-            //TODO FIGURE OUT WHY THE MOUSE MOVEMENT SOMETIMES GET VERY SLUGGISH WHEN MOVING A LOT.
             @Override
             public void mouseMoved(MouseEvent e) {
                 int currentX = e.getX();
