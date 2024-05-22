@@ -32,6 +32,7 @@ public class Camera {
         s2 = new S2(Sx, Sy, Ox, Oy);
     }
 
+    //TODO show this
     public V2 project(V3 p) {
         V3 EP = p.sub(E);
         double d = D.dot(EP);
@@ -231,6 +232,7 @@ public class Camera {
         // Calculate delta from the middle of the screen
         int deltaX = mouseX - screenWidth / 2;
         int deltaY = mouseY - (screenHeight / 2) + 11;
+
 
         //TODO Quaternions could be used to fix the rotation of the yaw + pitch.
 
