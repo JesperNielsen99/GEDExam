@@ -19,14 +19,14 @@
         ArrayList<ArrayList<Integer>> lines;
         Scanner scanner;
 
-        public WavefrontImporter(String filePath) {
+        public WavefrontImporter(String filePath, double ratio, V3 startpoint) {
             vectors = new ArrayList<>();
             faces = new ArrayList<>();
             lines = new ArrayList<>();
-            extractData(filePath);
+            extractData(filePath, ratio, startpoint);
         }
 
-        public void draw(Graphics g, Camera camera, V3 startPoint, double ratio, Color color) {
+        public void draw(Graphics g, Camera camera, Color color) {
             // Draw lines (if any)
             for (ArrayList<Integer> line : lines) {
                 int v1Index = line.get(0) - 1;
@@ -34,8 +34,8 @@
 
                 // Retrieve the corresponding vertices from the list
                 if (v1Index < vectors.size() && v2Index < vectors.size()) {
-                    V3 v1 = vectors.get(v1Index).mul(ratio).add(startPoint);
-                    V3 v2 = vectors.get(v2Index).mul(ratio).add(startPoint);
+                    V3 v1 = vectors.get(v1Index);
+                    V3 v2 = vectors.get(v2Index);
 
                     // Draw the line using the camera's method
                     camera.drawLine(g, v1, v2);
@@ -48,7 +48,7 @@
                 for (int vIndex : face) {
                     int vectorIndex = vIndex - 1;
                     if (vectorIndex >= 0 && vectorIndex < vectors.size()) {
-                        V3 vector = vectors.get(vectorIndex).mul(ratio).add(startPoint);
+                        V3 vector = vectors.get(vectorIndex);
                         vectorsToDraw.add(vector);
                     }
                 }
@@ -58,39 +58,7 @@
             }
         }
 
-        public void draw(Graphics g, Camera camera, double ratio, Color color) {
-            // Draw lines (if any)
-            for (ArrayList<Integer> line : lines) {
-                int v1Index = line.get(0) - 1;
-                int v2Index = line.get(1) - 1;
-
-                // Retrieve the corresponding vertices from the list
-                if (v1Index < vectors.size() && v2Index < vectors.size()) {
-                    V3 v1 = vectors.get(v1Index).mul(ratio);
-                    V3 v2 = vectors.get(v2Index).mul(ratio);
-
-                    // Draw the line using the camera's method
-                    camera.drawLine(g, v1, v2);
-                }
-            }
-
-            // Draw faces (if any)
-            for (ArrayList<Integer> face : faces) {
-                ArrayList<V3> vectorsToDraw = new ArrayList<>();
-                for (int vIndex : face) {
-                    int vectorIndex = vIndex - 1;
-                    if (vectorIndex >= 0 && vectorIndex < vectors.size()) {
-                        V3 vector = vectors.get(vectorIndex).mul(ratio);
-                        vectorsToDraw.add(vector);
-                    }
-                }
-                if (vectorsToDraw.size() > 2) {
-                    camera.drawFace(g, vectorsToDraw, color);
-                }
-            }
-        }
-
-        private void extractData(String filePath) {
+        private void extractData(String filePath, double ratio, V3 startPoint) {
             try {
                 File file = new File(filePath);
                 scanner = new Scanner(file).useLocale(Locale.US);
@@ -99,14 +67,14 @@
                     rawData.add(scanner.nextLine());
                 }
                 scanner.close();
-                setupData(rawData);
+                setupData(rawData, ratio,startPoint);
             } catch (FileNotFoundException e) {
                 System.out.println("An error occurred.");
                 e.printStackTrace();
             }
         }
 
-        private void setupData(ArrayList<String> rawData) {
+        private void setupData(ArrayList<String> rawData, double ratio, V3 startPoint) {
             if (!rawData.isEmpty()) {
                 for (String data : rawData) {
                     String[] lines = data.split("\\s+");
@@ -116,7 +84,7 @@
                             double z = Double.valueOf(lines[2]);
                             double y = Double.valueOf(lines[3]);
                             V3 v3 = new V3(x, y, z);
-                            vectors.add(v3);
+                            vectors.add(v3.mul(ratio).add(startPoint));
                             break;
                         } case "f": {
                             ArrayList<Integer> vectors = new ArrayList<>();
@@ -188,9 +156,7 @@
             }
             if (rotaionMatrix != null) {
                 for (int i = 0; i < vectors.size(); i++) {
-                    System.out.println("OLD VECTOR: " + vectors.get(i));
                     V3 vector = rotaionMatrix.mul(vectors.get(i));
-                    System.out.println("NEW VECTOR: " + vector);
                     vectors.set(i, vector);
                 }
             }

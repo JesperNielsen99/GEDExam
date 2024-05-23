@@ -34,8 +34,9 @@ public class ExamProgram extends JFrame {
         KeyListener keyListener = new KeyListener();
         MouseMotionHandler mouseMotionHandler = new MouseMotionHandler();
         MouseWheelHandler wheelHandler = new MouseWheelHandler();
-        WavefrontImporter wf = new WavefrontImporter("src/Files/Ferret.obj");
-        WavefrontImporter wf1 = new WavefrontImporter("src/Files/Tea_Pot.obj");
+        WavefrontImporter wf = new WavefrontImporter("src/Files/Ferret.obj", 0.1, new V3(0, 0, 0));
+        WavefrontImporter wf1 = new WavefrontImporter("src/Files/Tea_Pot.obj", 2, new V3(5, 5, 0));
+        DecimalFormat df = new DecimalFormat("#.00");
 
 
 
@@ -57,10 +58,9 @@ public class ExamProgram extends JFrame {
             super.paintComponent(g);
             g.drawString("Counter = " + fpsCounter.counter, 10, 10);
             g.drawString("Zoom = " + cam.getZoom(), getWidth()-70, 10);
-            DecimalFormat df = new DecimalFormat("#.00");
-            g.drawString("Coordinates = (" + df.format(cam.getE().x) + ", " + df.format(cam.getE().y) + ", " + df.format(cam.getE().z) + ")", getWidth()-190, getHeight()-5);
-            wf.draw(g, cam, new V3(0, 0, 0), 0.1, Color.GREEN);
-            //wf1.draw(g, cam, new V3(5, 5, 0), 2, Color.RED);
+            g.drawString("Coordinates = (" + df.format(cam.getE().x) + ", " + df.format(cam.getE().y) + ", " + df.format(cam.getE().z) + ")", getWidth()-192, getHeight()-5);
+            wf.draw(g, cam, Color.GREEN);
+            wf1.draw(g, cam, Color.RED);
             cam.drawAxis(g, 6, Color.magenta);
         }
 
