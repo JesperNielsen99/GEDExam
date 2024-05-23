@@ -59,7 +59,7 @@ public class ExamProgram extends JFrame {
             g.drawString("Coordinates = (" + cam.getE().x + ", " + cam.getE().y + ", " + cam.getE().z+ ")", getWidth()-190, getHeight()-5);
             wf.draw(g, cam, new V3(0, 0, 0), 0.1, Color.GREEN);
             //wf1.draw(g, cam, new V3(5, 5, 0), 2, Color.RED);
-            cam.drawAxis(g);
+            cam.drawAxis(g, 6, Color.magenta);
         }
 
         class TimerListener implements ActionListener {

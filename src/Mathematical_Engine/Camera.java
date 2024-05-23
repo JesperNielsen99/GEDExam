@@ -67,8 +67,10 @@ public class Camera {
         drawLine(g, O, k);
     }
 
-    public void drawAxis(Graphics g, int xLength, int yLength, boolean details , Color color) {
-        s2.drawAxis(g, xLength, yLength, details, color);
+    public void drawAxis(Graphics g, int length, Color color) {
+        drawLine(g, O, i.mul(length), color);
+        drawLine(g, O, j.mul(length), color);
+        drawLine(g, O, k.mul(length), color);
     }
 
     public void drawPoint(Graphics g, V3 p) {
