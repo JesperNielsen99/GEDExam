@@ -5,6 +5,7 @@ import Mathematical_Engine.V3;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.text.DecimalFormat;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -56,7 +57,8 @@ public class ExamProgram extends JFrame {
             super.paintComponent(g);
             g.drawString("Counter = " + fpsCounter.counter, 10, 10);
             g.drawString("Zoom = " + cam.getZoom(), getWidth()-70, 10);
-            g.drawString("Coordinates = (" + cam.getE().x + ", " + cam.getE().y + ", " + cam.getE().z+ ")", getWidth()-190, getHeight()-5);
+            DecimalFormat df = new DecimalFormat("#.00");
+            g.drawString("Coordinates = (" + df.format(cam.getE().x) + ", " + df.format(cam.getE().y) + ", " + df.format(cam.getE().z) + ")", getWidth()-190, getHeight()-5);
             wf.draw(g, cam, new V3(0, 0, 0), 0.1, Color.GREEN);
             //wf1.draw(g, cam, new V3(5, 5, 0), 2, Color.RED);
             cam.drawAxis(g, 6, Color.magenta);
