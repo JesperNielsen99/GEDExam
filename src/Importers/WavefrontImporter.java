@@ -188,9 +188,7 @@
             }
             if (rotaionMatrix != null) {
                 for (int i = 0; i < vectors.size(); i++) {
-                    System.out.println("OLD VECTOR: " + vectors.get(i));
                     V3 vector = rotaionMatrix.mul(vectors.get(i));
-                    System.out.println("NEW VECTOR: " + vector);
                     vectors.set(i, vector);
                 }
             }
