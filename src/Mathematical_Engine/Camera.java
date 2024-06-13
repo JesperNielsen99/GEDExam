@@ -67,8 +67,10 @@ public class Camera {
         drawLine(g, O, k);
     }
 
-    public void drawAxis(Graphics g, int xLength, int yLength, boolean details , Color color) {
-        s2.drawAxis(g, xLength, yLength, details, color);
+    public void drawAxis(Graphics g, int length, Color color) {
+        drawLine(g, O, i.mul(length), color);
+        drawLine(g, O, j.mul(length), color);
+        drawLine(g, O, k.mul(length), color);
     }
 
     public void drawPoint(Graphics g, V3 p) {
@@ -164,8 +166,8 @@ public class Camera {
                             U.z, 0, -U.x,
                             -U.y, U.x, 0);
         M3 Rx = I.add(Sx.mul(sin(phi))).add(Sx.mul(Sx).mul(1 - cos(phi)));
-        D = Rx.mul(D);
-        R = Rx.mul(R);
+        D = Rx.mul(D).unit();
+        R = Rx.mul(R).unit();
     }
 
     public void roll(double angle) {
@@ -174,8 +176,8 @@ public class Camera {
                             D.z, 0, -D.x,
                             -D.y, D.x, 0);
         M3 Rz = I.add(Sz.mul(sin(phi))).add(Sz.mul(Sz).mul(1-cos(phi)));
-        U = Rz.mul(U);
-        R = Rz.mul(R);
+        U = Rz.mul(U).unit();
+        R = Rz.mul(R).unit();
     }
 
     public void pitch(double angle) {
@@ -184,8 +186,8 @@ public class Camera {
                             R.z, 0, -R.x,
                             -R.y, R.x, 0);
         M3 Ry = I.add(Sy.mul(sin(phi))).add(Sy.mul(Sy).mul(1-cos(phi)));
-        D = Ry.mul(D);
-        U = Ry.mul(U);
+        D = Ry.mul(D).unit();
+        U = Ry.mul(U).unit();
     }
 
 
